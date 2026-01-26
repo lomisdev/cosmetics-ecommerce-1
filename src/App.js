@@ -39,19 +39,26 @@ function App() {
 
   // The back button-ensure user doesn't get logged out prematurely
   useEffect(() => {
-    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-      if (window.location.pathname === '/login') {
-        CapacitorApp.minimizeApp();
-      } else if (canGoBack) {
-        window.history.back();
-      } else {
-        CapacitorApp.minimizeApp();
-      }
-    });
+    // Only set up listener if Capacitor is available (native app)
+    if (typeof CapacitorApp !== 'undefined' && CapacitorApp.addListener) {
+      const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (window.location.pathname === '/login') {
+          CapacitorApp.minimizeApp();
+        } else if (canGoBack) {
+          window.history.back();
+        } else {
+          CapacitorApp.minimizeApp();
+        }
+      });
 
-    return () => {
-      backButtonListener.remove();
-    };
+      return () => {
+        // Only remove if listener exists and has remove method
+        if (backButtonListener && typeof backButtonListener.remove === 'function') {
+          backButtonListener.remove();
+        }
+      };
+    }
+    // No cleanup needed if Capacitor is not available
   }, []);
 
   return (
