@@ -20,6 +20,13 @@ class ApiService {
   }
 
   /**
+   * Set base URL dynamically
+   */
+  setBaseURL(url) {
+    this.baseURL = url;
+  }
+
+  /**
    * Make HTTP request
    * @param {string} endpoint - API endpoint
    * @param {Object} options - Fetch options

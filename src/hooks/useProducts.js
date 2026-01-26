@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { products, getProductById, getProductsByCategory, searchProducts } from '../data/products';
+import { productService } from '../services/productService';
 
 /**
  * Custom hook for product operations
@@ -8,34 +8,47 @@ import { products, getProductById, getProductsByCategory, searchProducts } from 
  */
 export const useProducts = (options = {}) => {
   const [productList, setProductList] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    try {
-      let filteredProducts = products;
-
-      if (options.category) {
-        filteredProducts = getProductsByCategory(options.category);
-      } else if (options.searchTerm) {
-        filteredProducts = searchProducts(options.searchTerm);
-      } else if (options.limit) {
-        filteredProducts = products.slice(0, options.limit);
-      }
-
-      setProductList(filteredProducts);
+    const fetchProducts = async () => {
+      setLoading(true);
       setError(null);
-    } catch (err) {
-      setError(err.message);
-      setProductList([]);
-    } finally {
-      setLoading(false);
-    }
+      
+      try {
+        let fetchedProducts = [];
+
+        if (options.category) {
+          fetchedProducts = await productService.getByCategory(options.category);
+        } else if (options.searchTerm) {
+          fetchedProducts = await productService.search(options.searchTerm);
+        } else if (options.limit) {
+          const allProducts = await productService.getAll();
+          fetchedProducts = allProducts.slice(0, options.limit);
+        } else {
+          fetchedProducts = await productService.getAll();
+        }
+
+        setProductList(fetchedProducts || []);
+      } catch (err) {
+        setError(err.message || 'Failed to fetch products');
+        setProductList([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, [options.category, options.searchTerm, options.limit]);
 
-  const getProduct = (id) => {
-    return getProductById(id);
+  const getProduct = async (id) => {
+    try {
+      return await productService.getById(id);
+    } catch (err) {
+      console.error('Error fetching product:', err);
+      return null;
+    }
   };
 
   return {

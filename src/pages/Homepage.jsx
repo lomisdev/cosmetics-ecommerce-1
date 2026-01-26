@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
-import { products } from '../data/products';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { useProducts } from '../hooks';
 import './Homepage.css';
 import logo from '../assets/back.png';
 
 const Homepage = () => {
-  // Get featured products (first 4 products)
-  const featuredProducts = products.slice(0, 4);
+  // Get featured products (first 4 products) from API
+  const { products: featuredProducts, loading } = useProducts({ limit: 4 });
 
   return (
     <div className="homepage">
@@ -44,11 +45,19 @@ const Homepage = () => {
       {/* === Featured Products Section === */}
       <section className="featured-section">
         <h2>✨ Featured Products</h2>
-        <div className="product-grid">
-          {featuredProducts.map(product => (
-            <ProductCard key={product.id} product={product} showDiscount={true} />
-          ))}
-        </div>
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="product-grid">
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map(product => (
+                <ProductCard key={product.id} product={product} showDiscount={true} />
+              ))
+            ) : (
+              <p>No featured products available.</p>
+            )}
+          </div>
+        )}
       </section>
     </div>
   );

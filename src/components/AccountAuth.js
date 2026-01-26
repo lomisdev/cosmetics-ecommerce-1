@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 import "./AccountAuth.css";
 
 export default function AccountAuth() {
@@ -10,35 +12,44 @@ export default function AccountAuth() {
     password: "",
   });
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, register } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setMessage(""); // Clear message on input change
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-    if (isSignup) {
-      // Sign up process
-      localStorage.setItem("user", JSON.stringify(formData));
-      setMessage("✅ Account created successfully! You can now sign in.");
-      setIsSignup(false);
-      setFormData({ name: "", email: "", password: "" });
-    } else {
-      // Login process
-      const storedUser = JSON.parse(localStorage.getItem("user"));
-      if (
-        storedUser &&
-        storedUser.email === formData.email &&
-        storedUser.password === formData.password
-      ) {
-        localStorage.setItem("loggedIn", "true");
-        setMessage(`👋 Welcome back, ${storedUser.name}!`);
-        setTimeout(() => navigate("/products"), 1000);
+    try {
+      if (isSignup) {
+        // Sign up process
+        const result = await register(formData);
+        if (result.success) {
+          setMessage("✅ Account created successfully! Redirecting...");
+          setTimeout(() => navigate("/products"), 1500);
+        } else {
+          setMessage(`❌ ${result.error || "Registration failed"}`);
+        }
       } else {
-        setMessage("❌ Invalid email or password.");
+        // Login process
+        const result = await login(formData.email, formData.password);
+        if (result.success) {
+          setMessage(`👋 Welcome back, ${result.user?.name || "User"}!`);
+          setTimeout(() => navigate("/products"), 1000);
+        } else {
+          setMessage(`❌ ${result.error || "Invalid email or password"}`);
+        }
       }
+    } catch (error) {
+      setMessage(`❌ ${error.message || "An error occurred"}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,8 +85,8 @@ export default function AccountAuth() {
             onChange={handleChange}
             required
           />
-          <button type="submit" className="auth-btn">
-            {isSignup ? "Sign Up" : "Sign In"}
+          <button type="submit" className="auth-btn" disabled={loading}>
+            {loading ? "Please wait..." : (isSignup ? "Sign Up" : "Sign In")}
           </button>
         </form>
 

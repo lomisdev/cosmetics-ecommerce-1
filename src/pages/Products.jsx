@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { getProductById, products } from '../data/products';
+import { productService } from '../services/productService';
 import './Products.css';
 
 const Products = () => {
@@ -15,32 +15,38 @@ const Products = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      if (id) {
-        const foundProduct = getProductById(id);
-        setProduct(foundProduct);
-        
-        // Get related products (same category, excluding current product)
-        if (foundProduct) {
-          const related = products
-            .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-            .slice(0, 4);
-          setRelatedProducts(related);
+    const fetchProductData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        if (id) {
+          const foundProduct = await productService.getById(id);
+          setProduct(foundProduct);
+          
+          // Get related products (same category, excluding current product)
+          if (foundProduct) {
+            const allProducts = await productService.getAll();
+            const related = allProducts
+              .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
+              .slice(0, 4);
+            setRelatedProducts(related);
+          } else {
+            setError('Product not found');
+          }
         } else {
-          setError('Product not found');
+          // If no ID, show all products
+          const allProducts = await productService.getAll();
+          setRelatedProducts(allProducts || []);
         }
-      } else {
-        // If no ID, show all products
-        setRelatedProducts(products);
+      } catch (err) {
+        setError(err.message || 'An error occurred');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.message || 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    fetchProductData();
   }, [id]);
 
   if (loading) {
@@ -73,7 +79,13 @@ const Products = () => {
       <div className="product-detail-container">
         <div className="product-detail">
           <div className="product-detail-image">
-            <img src={product.image || '/images/default-product.jpg'} alt={product.name} />
+            <img 
+              src={product.image || '/images/products/default-product.jpg'} 
+              alt={product.name}
+              onError={(e) => {
+                e.target.src = 'https://placehold.co/600x600?text=Product+Image';
+              }}
+            />
           </div>
           <div className="product-detail-info">
             <h1>{product.name}</h1>

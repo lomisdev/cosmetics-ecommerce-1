@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDebounce } from '../hooks';
+import { productService } from '../services/productService';
 import ProductCard from '../components/ProductCard';
-import { products, getProductsByCategory, searchProducts } from '../data/products';
+import LoadingSpinner from '../components/LoadingSpinner';
 import './ProductListing.css';
 
 const ProductListing = () => {
@@ -11,17 +12,40 @@ const ProductListing = () => {
   const debouncedSearch = useDebounce(search, 300);
   const category = searchParams.get('cat');
   const searchQuery = searchParams.get('search');
-
-  // Filter products based on category or search
-  let filteredProducts = products;
   
-  if (category) {
-    filteredProducts = getProductsByCategory(category);
-  } else if (searchQuery) {
-    filteredProducts = searchProducts(searchQuery);
-  } else if (debouncedSearch) {
-    filteredProducts = searchProducts(debouncedSearch);
-  }
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        let products = [];
+        
+        if (category) {
+          products = await productService.getByCategory(category);
+        } else if (searchQuery) {
+          products = await productService.search(searchQuery);
+        } else if (debouncedSearch) {
+          products = await productService.search(debouncedSearch);
+        } else {
+          products = await productService.getAll();
+        }
+        
+        setFilteredProducts(products || []);
+      } catch (err) {
+        setError(err.message || 'Failed to load products');
+        setFilteredProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [category, searchQuery, debouncedSearch]);
 
   return (
     <div className="product-listing-container">
@@ -37,15 +61,21 @@ const ProductListing = () => {
         onChange={(e) => setSearch(e.target.value)}
       />
       
-      <div className="product-grid">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} showDiscount={true} />
-          ))
-        ) : (
-          <p className="no-products">No products found.</p>
-        )}
-      </div>
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <p className="no-products">Error: {error}</p>
+      ) : (
+        <div className="product-grid">
+          {filteredProducts.length > 0 ? (
+            filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} showDiscount={true} />
+            ))
+          ) : (
+            <p className="no-products">No products found.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

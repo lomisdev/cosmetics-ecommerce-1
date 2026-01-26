@@ -26,9 +26,12 @@ const Cart = () => {
             {validCartItems.map(item => (
               <div key={item.id} className="cart-item">
                 <img
-                  src={item.image || '/images/default-product.jpg'}
+                  src={item.image || '/images/products/default-product.jpg'}
                   alt={item.name}
                   className="cart-item-image"
+                  onError={(e) => {
+                    e.target.src = 'https://placehold.co/80x80?text=Product';
+                  }}
                 />
                 <div className="cart-item-details">
                   <h3 className="cart-item-name">{item.name}</h3>

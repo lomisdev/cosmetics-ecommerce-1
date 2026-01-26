@@ -25,10 +25,13 @@ const ProductCard = ({ product, showDiscount = false }) => {
       )}
       <Link to={`/product/${product.id}`} className="product-card-link">
         <img
-          src={product.image || '/images/default-product.jpg'}
+          src={product.image || '/images/products/default-product.jpg'}
           alt={product.name}
           className="product-image"
           loading="lazy"
+          onError={(e) => {
+            e.target.src = 'https://placehold.co/300x300?text=Product+Image';
+          }}
         />
         <h3 className="product-name">{product.name}</h3>
         <p className="product-price">
