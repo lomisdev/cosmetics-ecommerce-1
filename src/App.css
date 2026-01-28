@@ -30,7 +30,13 @@ body {
 
 main {
   flex: 1;
-  padding: 20px;
+  padding: clamp(12px, 3vw, 20px);
+  padding-top: clamp(80px, 20vw, 100px); /* Space for fixed AppBar */
+  padding-bottom: clamp(60px, 15vw, 80px); /* Space for BottomNavbar */
+}
+
+.main-content {
+  min-height: calc(100vh - clamp(140px, 35vw, 180px)); /* Account for both bars */
 }
 
 /* Buttons */
@@ -38,10 +44,16 @@ main {
   background-color: #e91e63; /* Pink accent */
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  padding: clamp(8px, 2vw, 10px) clamp(16px, 4vw, 20px);
+  border-radius: clamp(4px, 1vw, 5px);
   cursor: pointer;
-  transition: background 0.3s;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  transition: background 0.3s ease;
+  min-height: clamp(36px, 9vw, 44px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn:hover {
@@ -51,7 +63,44 @@ main {
 /* Responsive */
 @media (max-width: 768px) {
   main {
-    padding: 10px;
+    padding: clamp(8px, 2vw, 10px);
+    padding-top: clamp(50px, 12vw, 70px); /* Smaller space for AppBar on mobile */
+    padding-bottom: clamp(50px, 12vw, 70px); /* Smaller space for BottomNavbar on mobile */
+  }
+  
+  .main-content {
+    min-height: calc(100vh - clamp(100px, 24vw, 140px)); /* Adjusted for mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  main {
+    padding: clamp(6px, 1.5vw, 8px);
+    padding-top: clamp(45px, 11vw, 60px); /* Even smaller space for AppBar on small mobile */
+    padding-bottom: clamp(45px, 11vw, 60px); /* Even smaller space for BottomNavbar on small mobile */
+  }
+  
+  .main-content {
+    min-height: calc(100vh - clamp(90px, 22vw, 120px)); /* Adjusted for small mobile */
+  }
+}
+
+@media (max-width: 360px) {
+  /* Extra small phones */
+  main {
+    padding: 4px 6px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  
+  .main-content {
+    min-height: calc(100vh - 80px);
+  }
+  
+  .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 32px;
   }
 }
 
@@ -134,7 +183,8 @@ main {
 
 /* === Fade-In Effect for App after Splash === */
 .fade-in {
-  animation: fadeIn 0.8s ease-in forwards;
+  opacity: 0;
+  animation: fadeIn 0.8s ease-in 2.5s forwards;
 }
 
 /* iOS safe area support */

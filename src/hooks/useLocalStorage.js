@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { storage } from '../utils/storage';
 import { logger } from '../utils/logger';
 

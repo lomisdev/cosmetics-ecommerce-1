@@ -13,7 +13,7 @@ body {
 
 /* Optional: Add a background image (for branding) */
 body.with-logo {
-  background: url("./glowify-logo.jpg") no-repeat center center fixed;
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.4), rgba(255, 215, 0, 0.4)) no-repeat center center fixed;
   background-size: cover;
   color: white;
 }

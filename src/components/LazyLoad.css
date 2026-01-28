@@ -1,0 +1,71 @@
+.lazy-load-container {
+  min-height: 200px;
+  position: relative;
+}
+
+.lazy-load-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #f0f0f0 0%, #e0e0e0 100%);
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.lazy-load-container.loaded::before {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Fallback skeleton */
+.lazy-load-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.lazy-load-fallback .skeleton {
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.lazy-load-fallback .skeleton.title {
+  height: 24px;
+  width: 60%;
+}
+
+.lazy-load-fallback .skeleton.text {
+  height: 16px;
+  width: 100%;
+}
+
+.lazy-load-fallback .skeleton.short {
+  height: 16px;
+  width: 40%;
+}
+
+.lazy-load-fallback .skeleton.image {
+  height: 200px;
+  width: 100%;
+  border-radius: 8px;
+}

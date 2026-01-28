@@ -1,4 +1,3 @@
-// Application Configuration
 export const APP_CONFIG = {
   APP_NAME: 'Glowify',
   APP_VERSION: '1.0.0',
@@ -6,22 +5,6 @@ export const APP_CONFIG = {
   CART_STORAGE_KEY: 'cart',
   USER_STORAGE_KEY: 'user',
   PRODUCTS_STORAGE_KEY: 'products',
+  WISHLIST_STORAGE_KEY: 'wishlist',
   SPLASH_DURATION: 1200, // milliseconds
-};
-
-// Product Categories
-export const CATEGORIES = {
-  SKINCARE: 'Skincare',
-  MAKEUP: 'Makeup',
-  LIPS: 'Lips',
-  FRAGRANCE: 'Fragrance',
-  HAIRCARE: 'Haircare',
-  ACCESSORIES: 'Accessories',
-};
-
-// Currency
-export const CURRENCY = {
-  SYMBOL: '$',
-  CODE: 'USD',
-  LOCALE: 'en-US',
 };

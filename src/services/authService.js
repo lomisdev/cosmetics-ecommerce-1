@@ -1,6 +1,5 @@
 import { apiService } from './api';
 import { storage } from '../utils/storage';
-import { APP_CONFIG } from '../constants/config';
 
 /**
  * Authentication API service
