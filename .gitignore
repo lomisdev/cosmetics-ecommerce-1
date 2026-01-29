@@ -10,6 +10,8 @@
 
 # production
 /build
+# But allow APK files
+!/*.apk
 
 # misc
 .DS_Store
